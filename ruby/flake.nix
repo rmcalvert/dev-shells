@@ -11,6 +11,6 @@
 
         # used by nix shell and nix develop
         devShell = with pkgs;
-          mkShell { nativeBuildInputs = [ ruby_3_2 postgresql redis ]; };
+          mkShell { nativeBuildInputs = [ ruby postgresql redis ]; };
       });
 }
