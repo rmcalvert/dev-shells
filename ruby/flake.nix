@@ -1,26 +1,16 @@
-# Run with: nix develop
 {
-  description = "Development environment for Ruby and Rails";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let pkgs = nixpkgs.legacyPackages.${system};
+      in {
 
-  allSystems = [
-    "x86_64-linux" # 64-bit Intel/AMD Linux
-    "aarch64-linux" # 64-bit ARM Linux
-    "x86_64-darwin" # 64-bit Intel macOS
-    "aarch64-darwin" # 64-bit ARM macOS
-  ];
-
-  outputs = { self, nixpkgs }:
-    let
-      pkgs = nixpkgs.lib.mkEnv {
-        system = "aarch64-darwin"; # aarch64-darwin, x86_64-linux
-        packages = pkgs: [
-          pkgs.ruby_3_4
-          # pkgs.rails
-          pkgs.redis
-          pkgs.postgresql
-        ];
-      };
-    in { devShell = pkgs; };
+        # used by nix shell and nix develop
+        devShell = with pkgs;
+          mkShell { nativeBuildInputs = [ ruby_3_2 postgresql redis ]; };
+      });
 }

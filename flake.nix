@@ -43,6 +43,14 @@
           '';
           buildTools = [ "All essential rust tools" "rust-analyzer" ];
         };
+        ruby = mkWelcomeText {
+          path = ./ruby;
+          name = "Ruby Template";
+          description = ''
+            A basic ruby application template with a package build.
+          '';
+          buildTools = [ "All essential ruby tools" "bundler" ];
+        };
         zig = mkWelcomeText {
           path = ./zig;
           name = "Zig Template";
