@@ -12,7 +12,7 @@
         # used by nix shell and nix develop
         devShell = with pkgs;
           mkShell {
-            nativeBuildInputs = [ ruby bundler rubyPackages.solargraph libyaml openssl_3 gmp postgresql redis ];
+            nativeBuildInputs = [ ruby bundler ruby-lsp libyaml openssl_3 gmp postgresql redis ];
           };
       });
 }
