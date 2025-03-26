@@ -30,9 +30,9 @@
               postgresql
               redis
             ];
-            BUNDLE_PATH = ".bundle/gems";
-            GEM_HOME = ".gems";
-            GEM_PATH = ".gems";
+            # BUNDLE_PATH = ".bundle/gems";
+            # GEM_HOME = ".gems";
+            # GEM_PATH = ".gems";
           };
 
       }
