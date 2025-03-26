@@ -4,15 +4,37 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
 
         # used by nix shell and nix develop
-        devShell = with pkgs;
+        devShell =
+          with pkgs;
           mkShell {
-            nativeBuildInputs = [ ruby bundler ruby-lsp libyaml openssl_3 gmp postgresql redis ];
+            buildInputs = [
+              ruby
+              bundler
+              libyaml
+              openssl_3
+              gmp
+              postgresql
+              redis
+            ];
+            # BUNDLE_PATH = ".bundle/gems";
+            # GEM_HOME = ".gems";
+            # GEM_PATH = ".gems";
           };
-      });
+
+      }
+    );
 }
