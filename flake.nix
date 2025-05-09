@@ -1,10 +1,18 @@
 {
   description = "Starter dev templates";
 
-  outputs = { self }:
+  outputs =
+    { self }:
     let
-      mkWelcomeText = { name, description, path, buildTools ? null
-        , additionalSetupInfo ? null, }: {
+      mkWelcomeText =
+        {
+          name,
+          description,
+          path,
+          buildTools ? null,
+          additionalSetupInfo ? null,
+        }:
+        {
           inherit path;
 
           description = name;
@@ -13,11 +21,15 @@
             # ${name}
             ${description}
 
-            ${if buildTools != null then ''
-              Comes bundled with:
-              ${builtins.concatStringsSep ", " buildTools}
-            '' else
-              ""}
+            ${
+              if buildTools != null then
+                ''
+                  Comes bundled with:
+                  ${builtins.concatStringsSep ", " buildTools}
+                ''
+              else
+                ""
+            }
             ## Other tips
             If you use direnv run:
 
@@ -26,7 +38,8 @@
             ```
           '';
         };
-    in {
+    in
+    {
       templates = {
         empty = mkWelcomeText {
           name = "Empty Template";
@@ -41,7 +54,10 @@
           description = ''
             A basic rust application template with a package build.
           '';
-          buildTools = [ "All essential rust tools" "rust-analyzer" ];
+          buildTools = [
+            "All essential rust tools"
+            "rust-analyzer"
+          ];
         };
         ruby = mkWelcomeText {
           path = ./ruby;
@@ -49,7 +65,10 @@
           description = ''
             A basic ruby application template with a package build.
           '';
-          buildTools = [ "All essential ruby tools" "bundler" ];
+          buildTools = [
+            "All essential ruby tools"
+            "bundler"
+          ];
         };
         zig = mkWelcomeText {
           path = ./zig;
@@ -57,13 +76,19 @@
           description = ''
             A basic Zig application template with a package build.
           '';
-          buildTools = [ "zig" "zls" ];
+          buildTools = [
+            "zig"
+            "zls"
+          ];
         };
         go = mkWelcomeText {
           path = ./go;
           name = "Go template";
           description = "A basic go project";
-          buildTools = [ "go" "gopls" ];
+          buildTools = [
+            "go"
+            "gopls"
+          ];
         };
         python = mkWelcomeText {
           path = ./python;
@@ -79,7 +104,21 @@
           description = ''
             A basic NextJS application template with a package build.
           '';
-          buildTools = [ "nodejs" "pnpm" ];
+          buildTools = [
+            "nodejs"
+            "pnpm"
+          ];
+        };
+        tanstack = mkWelcomeText {
+          path = ./tanstack;
+          name = "Tanstack Template";
+          description = ''
+            A basic Tanstack Start application template with a package build.
+          '';
+          buildTools = [
+            "nodejs"
+            "pnpm"
+          ];
         };
       };
     };
