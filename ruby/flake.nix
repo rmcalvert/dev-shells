@@ -54,7 +54,7 @@
               #   ]
               # ))
               # my_ruby
-              unstable_pkgs.mise
+              # unstable_pkgs.mise
               # gems # defined above
               ### # bundix
               openssl_3
@@ -78,7 +78,7 @@
             #   3. vectorcode vectorize app/**/*.rb
             shellHook = ''
               ## export PATH=".gems/bin:$HOME/.local/bin:$PATH"
-              eval "$(mise activate)"
+              # eval "$(mise activate)"
               # export PATH=".gems/bin:$PATH"
               # pipx install chromadb
               # pipx upgrade vectorcode
