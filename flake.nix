@@ -81,6 +81,14 @@
             "zls"
           ];
         };
+        n8n = mkWelcomeText {
+          path = ./n8n;
+          name = "n8n template";
+          description = "A basic n8n template";
+          buildTools = [
+            "n8n"
+          ];
+        };
         go = mkWelcomeText {
           path = ./go;
           name = "Go template";
