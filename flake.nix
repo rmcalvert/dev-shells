@@ -48,6 +48,16 @@
           '';
           path = ./empty;
         };
+        kotlin = mkWelcomeText {
+          path = ./kotlin;
+          name = "Kotlin Template";
+          description = ''
+            A basic kotlin application template with a package build.
+          '';
+          buildTools = [
+            "All essential kotlin tools"
+          ];
+        };
         rust = mkWelcomeText {
           path = ./rust;
           name = "Rust Template";
