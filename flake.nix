@@ -1,143 +1,74 @@
 {
-  description = "Starter dev templates";
+  inputs = {
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  };
 
   outputs =
-    { self }:
-    let
-      mkWelcomeText =
-        {
-          name,
-          description,
-          path,
-          buildTools ? null,
-          additionalSetupInfo ? null,
-        }:
-        {
-          inherit path;
-
-          description = name;
-
-          welcomeText = ''
-            # ${name}
-            ${description}
-
-            ${
-              if buildTools != null then
-                ''
-                  Comes bundled with:
-                  ${builtins.concatStringsSep ", " buildTools}
-                ''
-              else
-                ""
-            }
-            ## Other tips
-            If you use direnv run:
-
-            ```
-                echo "use flake" > .envrc
-            ```
-          '';
-        };
-    in
     {
-      templates = {
-        empty = mkWelcomeText {
-          name = "Empty Template";
-          description = ''
-            A simple flake that provides a devshell
-          '';
-          path = ./empty;
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        unstable = import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true; # Required for claude-code, intellij
         };
-        kotlin = mkWelcomeText {
-          path = ./kotlin;
-          name = "Kotlin Template";
-          description = ''
-            A basic kotlin application template with a package build.
-          '';
-          buildTools = [
-            "All essential kotlin tools"
-          ];
-        };
-        rust = mkWelcomeText {
-          path = ./rust;
-          name = "Rust Template";
-          description = ''
-            A basic rust application template with a package build.
-          '';
-          buildTools = [
-            "All essential rust tools"
-            "rust-analyzer"
-          ];
-        };
-        ruby = mkWelcomeText {
-          path = ./ruby;
-          name = "Ruby Template";
-          description = ''
-            A basic ruby application template with a package build.
-          '';
-          buildTools = [
-            "All essential ruby tools"
-            "bundler"
-          ];
-        };
-        zig = mkWelcomeText {
-          path = ./zig;
-          name = "Zig Template";
-          description = ''
-            A basic Zig application template with a package build.
-          '';
-          buildTools = [
-            "zig"
-            "zls"
-          ];
-        };
-        n8n = mkWelcomeText {
-          path = ./n8n;
-          name = "n8n template";
-          description = "A basic n8n template";
-          buildTools = [
-            "n8n"
-          ];
-        };
-        go = mkWelcomeText {
-          path = ./go;
-          name = "Go template";
-          description = "A basic go project";
-          buildTools = [
-            "go"
-            "gopls"
-          ];
-        };
-        python = mkWelcomeText {
-          path = ./python;
-          name = "Python Template";
-          description = ''
-            A basic python project
-          '';
-          buildTools = [ "python310" ];
-        };
-        nextjs = mkWelcomeText {
-          path = ./nextjs;
-          name = "NextJS Template";
-          description = ''
-            A basic NextJS application template with a package build.
-          '';
-          buildTools = [
-            "nodejs"
-            "pnpm"
-          ];
-        };
-        tanstack = mkWelcomeText {
-          path = ./tanstack;
-          name = "Tanstack Template";
-          description = ''
-            A basic Tanstack Start application template with a package build.
-          '';
-          buildTools = [
-            "nodejs"
-            "pnpm"
-          ];
-        };
-      };
-    };
+        java = pkgs.zulu23;
+        gradle = pkgs.gradle.override { inherit java; };
+        kotlin = pkgs.kotlin.override { jre = java; };
+        intellij = unstable.jetbrains.idea-ultimate;
+        claude-code = unstable.claude-code;
+      in
+      {
+        devShell =
+          with pkgs;
+          mkShell {
+            buildInputs = [
+              java
+              gradle
+              kotlin
+              intellij
+              # gcc
+              # ncurses
+              # patchelf
+              # zlib
+              # libGL
+              # xorg.libX11
+              fontconfig
+              ktfmt
+              claude-code
+            ];
+            shellHook = ''
+              export BASE_DIR=$(pwd)
+              mkdir -p $BASE_DIR/.share
+
+              if [ -L "$BASE_DIR/.share/java" ]; then
+                unlink "$BASE_DIR/.share/java"
+              fi
+              ln -sf ${java}/lib/openjdk $BASE_DIR/.share/java
+
+              if [ -L "$BASE_DIR/.share/gradle" ]; then
+                unlink "$BASE_DIR/.share/gradle"
+              fi
+              ln -sf ${gradle}/lib/gradle $BASE_DIR/.share/gradle
+              export GRADLE_HOME="$BASE_DIR/.share/gradle"
+
+              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${
+                pkgs.lib.makeLibraryPath [
+                  kotlin
+                  pkgs.libGL
+                  pkgs.xorg.libX11
+                  pkgs.fontconfig
+                ]
+              };
+            '';
+          };
+      }
+    );
 }
