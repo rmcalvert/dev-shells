@@ -1,11 +1,15 @@
 {
-  description = "A Nix-flake-based Kotlin development environment";
-
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
-  nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs = {
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  };
 
   outputs =
-    inputs:
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+    }:
     let
       javaVersion = 23; # Change this value to update the whole stack
 
@@ -17,14 +21,14 @@
       ];
       forEachSupportedSystem =
         f:
-        inputs.nixpkgs.lib.genAttrs supportedSystems (
+        nixpkgs.lib.genAttrs supportedSystems (
           system:
           f {
-            pkgs = import inputs.nixpkgs {
+            pkgs = import nixpkgs {
               inherit system;
-              overlays = [ inputs.self.overlays.default ];
+              overlays = [ self.overlays.default ];
             };
-            unstable_pkgs = import inputs.nixpkgs-unstable {
+            unstable_pkgs = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true; # Required for claude-code
             };
@@ -43,7 +47,7 @@
         };
 
       devShells = forEachSupportedSystem (
-        { pkgs }:
+        { pkgs, unstable_pkgs }:
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
@@ -53,6 +57,7 @@
               ncurses
               patchelf
               zlib
+              ktfmt
               unstable_pkgs.claude-code
             ];
           };
